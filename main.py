@@ -19,8 +19,6 @@ sorted_events = {key: [] for key in set([i["device"] for i in events])}
 
 for event in events:
     sorted_events[event["device"]].append(event)
-with open("log.txt", "w") as f:
-    f.write(str(sorted_events))
 
 devices = range(0, 6)
 
