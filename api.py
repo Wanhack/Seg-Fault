@@ -116,6 +116,10 @@ async def detect_motion(device: int) -> bool:
                 continue
             movement_found += 1
         previous_frame = gray
+    if params[device].consecutive_detects > config["max_record"] * 24:
+        del params[device]
+        params[device] = DeviceParams()
+        return False
     if movement_found > config["frames_required"]:
         params[device].consecutive_detects += 1
         return True
@@ -127,7 +131,7 @@ async def detect_motion(device: int) -> bool:
         r.hset(f"{device}_entry_{params[device].motion_start}", mapping={
             "device": device,
             "movement_start": params[device].motion_start,
-            "movement_end": params[device].motion_end,
+            "movement_end": int(params[device].motion_end),
             "video_path": filename
         })
         if config["send_alerts"] and params[device].consecutive_detects > config["alert_threshold"] * 24:
