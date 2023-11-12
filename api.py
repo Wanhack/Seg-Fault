@@ -1,5 +1,6 @@
 import asyncio
 import dataclasses
+import datetime
 import json
 import os
 import shutil
@@ -67,7 +68,11 @@ async def post_frame(request: Request, device: int, file: UploadFile = File(...)
     if len(params[device].past_second) > 24:
         del params[device].past_second[0]
 
-    asyncio.create_task(detect_motion(device))
+    now = datetime.datetime.now()
+    start_hour = config["working_hours"][0]
+    end_hour = config["working_hours"][1]
+    if start_hour <= now.hour or now.hour <= end_hour:
+        asyncio.create_task(detect_motion(device))
     return Response(content="OK")
 
 
