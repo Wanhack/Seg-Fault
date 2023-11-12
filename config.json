@@ -1,6 +1,6 @@
 {
   "send_alerts": true,
-  "email_recipients": ["midnight14589@gmail.com"],
+  "email_recipients": [],
   "sensitivity": 500,
   "alert_threshold": 30,
   "threshold": 10,
