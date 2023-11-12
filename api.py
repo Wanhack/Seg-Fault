@@ -62,9 +62,9 @@ async def post_frame(request: Request, device: int, file: UploadFile = File(...)
     file_bytes = np.asarray(bytearray(request_object_content), dtype=np.uint8)
     img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
     params[device].past_second.append(img)
-    if params[device].capturing:
+    if params[device].capturing and not params[device].saving:
         if not params[device].initialized:
-            params[device].captured_frames = [i for i in params[device].past_second]
+            # params[device].captured_frames = [i for i in params[device].past_second]
             params[device].initialized = True
         params[device].captured_frames.append(img)
     if len(params[device].past_second) > 24:
@@ -96,7 +96,7 @@ def get_events():
 async def detect_motion(device: int) -> bool:
     if params[device].consecutive_detects > config["threshold"] * 24:
         if params[device].motion_start == 0:
-            params[device].motion_start = int(time.time() - 10)
+            params[device].motion_start = int(time.time() - config["threshold"])
             params[device].capturing = True
 
     movement_found = 0
@@ -120,9 +120,9 @@ async def detect_motion(device: int) -> bool:
         params[device].consecutive_detects += 1
         return True
 
-    if params[device].capturing and not params[device].saving:
+    if params[device].capturing:
         params[device].capturing = False
-        params[device].motion_end = int(time.time())
+        params[device].motion_end = params[device].motion_start + int(len(params[device].captured_frames) / 24)
         filename = f"{device}_{params[device].motion_start}.mp4"
         r.hset(f"{device}_entry_{params[device].motion_start}", mapping={
             "device": device,
@@ -147,15 +147,16 @@ async def save_video(device: DeviceParams, filename: str):
     tmp_dir = "tmp"
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
+    os.mkdir(os.path.join(tmp_dir, f"{device.id}"))
 
     for idx, frame in enumerate(device.captured_frames):
-        cv2.imwrite(f"tmp/{device.id}_{idx:02}.jpg", frame)
+        cv2.imwrite(f"tmp/{device.id}/{device.id}_{idx:02}.jpg", frame)
 
-    (ffmpeg.input(os.path.join(tmp_dir, "*.jpg"), pattern_type='glob', framerate=24)
+    (ffmpeg.input(os.path.join(tmp_dir, f"{device.id}_*.jpg"), pattern_type='glob', framerate=24)
      .output(os.path.join(os.path.join("events", "videos"), filename)).run())
 
     device.captured_frames = []
-    shutil.rmtree(tmp_dir)
+    shutil.rmtree(os.path.join(tmp_dir, f"{device.id}"))
     del device
 
 
