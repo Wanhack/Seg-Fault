@@ -20,8 +20,6 @@ with open("creds.json", "r") as f:
 with open("config.json", "r") as f:
     config = json.load(f)
 
-doSendAlerts = False
-
 r = redis.Redis(host=creds["host"], username=creds["username"], password=creds["password"], port=creds["port"], db=0)
 
 templates = Jinja2Templates(directory="templates")
@@ -40,6 +38,7 @@ app.add_middleware(
 
 @dataclasses.dataclass
 class DeviceParams:
+    id: int = 0
     consecutive_detects: int = 0
     past_second: list = dataclasses.field(default_factory=list)
     motion_start: int = 0
@@ -56,17 +55,21 @@ params = {}
 async def post_frame(request: Request, device: int, file: UploadFile = File(...)):
     if device not in params:
         params[device] = DeviceParams()
+    params[device].id = device
     request_object_content = await file.read()
     file_bytes = np.asarray(bytearray(request_object_content), dtype=np.uint8)
     img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
     params[device].past_second.append(img)
     if params[device].capturing:
-        print(len(params[device].captured_frames))
+        if len(params[device].captured_frames) == 0:
+            params[device].captured_frames = [i for i in params[device].past_second]
         params[device].captured_frames.append(img)
     if len(params[device].past_second) > 24:
-        params[device].past_second.pop(0)
+        del params[device].past_second[0]
 
     asyncio.create_task(detect_motion(device))
+    print("returned!")
+    return Response(content="OK")
 
 
 @app.get("/api/movement/{device}")
@@ -85,13 +88,10 @@ def get_events():
 
 # noinspection PyAsyncCall
 async def detect_motion(device: int) -> bool:
-    if device not in params:
-        params[device] = DeviceParams()
-    if params[device].consecutive_detects > config["threshold"]:
+    if params[device].consecutive_detects > config["threshold"] * 24:
         if params[device].motion_start == 0:
             params[device].motion_start = int(time.time() - 10)
             params[device].capturing = True
-            params[device].captured_frames = params[device].past_second
 
     movement_found = 0
     previous_frame = None
@@ -124,7 +124,7 @@ async def detect_motion(device: int) -> bool:
             "movement_end": params[device].motion_end,
             "video_path": filename
         })
-        if doSendAlerts:
+        if config["send_alerts"]:
             for i in config["email_recipients"]:
                 send_alert.send_email(device, params[device].motion_start, i)
         asyncio.create_task(save_video(params[device], filename))
@@ -135,24 +135,19 @@ async def detect_motion(device: int) -> bool:
 
 async def save_video(device: DeviceParams, filename: str):
     device.saving = True
-    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    # out = cv2.VideoWriter(filename, fourcc, 24, (600, 600))
     tmp_dir = "tmp"
     if not os.path.exists(tmp_dir):
         os.mkdir(tmp_dir)
 
     for idx, frame in enumerate(device.captured_frames):
-        cv2.imwrite(f"tmp/{idx}.jpg", frame)
+        cv2.imwrite(f"tmp/{device.id}_{idx:02}.jpg", frame)
 
-    # for frame in device.captured_frames:
-    #     out.write(frame)
-    # out.release()
-
-    images = [img for img in os.listdir(tmp_dir) if img.endswith(".jpg")]
-    ffmpeg.input(os.path.join(tmp_dir, "*.jpg"), pattern_type='glob', framerate=24).output(os.path.join(os.path.join("events", "videos"), filename)).run()
+    (ffmpeg.input(os.path.join(tmp_dir, "*.jpg"), pattern_type='glob', framerate=24)
+     .output(os.path.join(os.path.join("events", "videos"), filename)).run())
 
     device.captured_frames = []
     shutil.rmtree(tmp_dir)
+    del device
 
 
 @app.get("/api/live/{device}")
