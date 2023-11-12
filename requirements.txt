@@ -1,0 +1,10 @@
+opencv-python
+numpy
+redis
+fastapi
+starlette
+aiohttp
+pandas
+streamlit
+requests
+ffmpeg-python
