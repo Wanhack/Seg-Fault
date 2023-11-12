@@ -1,1 +1,4 @@
 creds.json
+.idea/
+events/
+__pycache__/
