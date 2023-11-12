@@ -130,7 +130,7 @@ async def detect_motion(device: int) -> bool:
         filename = f"{device}_{params[device].motion_start}.mp4"
         r.hset(f"{device}_entry_{params[device].motion_start}", mapping={
             "device": device,
-            "movement_start": params[device].motion_start,
+            "movement_start": int(params[device].motion_start),
             "movement_end": int(params[device].motion_end),
             "video_path": filename
         })
@@ -156,7 +156,7 @@ async def save_video(device: DeviceParams, filename: str):
     for idx, frame in enumerate(device.captured_frames):
         cv2.imwrite(f"tmp/{device.id}/{device.id}_{idx:02}.jpg", frame)
 
-    (ffmpeg.input(os.path.join(tmp_dir, f"{device.id}_*.jpg"), pattern_type='glob', framerate=24)
+    (ffmpeg.input(os.path.join(os.path.join(tmp_dir, f"{device.id}"), f"{device.id}_*.jpg"), pattern_type='glob', framerate=24)
      .output(os.path.join(os.path.join("events", "videos"), filename)).run())
 
     device.captured_frames = []
