@@ -47,6 +47,7 @@ class DeviceParams:
     capturing: bool = False
     captured_frames: list = dataclasses.field(default_factory=list)
     saving: bool = False
+    initialized: bool = False
 
 
 params = {}
@@ -62,8 +63,9 @@ async def post_frame(request: Request, device: int, file: UploadFile = File(...)
     img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
     params[device].past_second.append(img)
     if params[device].capturing:
-        if len(params[device].captured_frames) == 0:
+        if not params[device].initialized:
             params[device].captured_frames = [i for i in params[device].past_second]
+            params[device].initialized = True
         params[device].captured_frames.append(img)
     if len(params[device].past_second) > 24:
         del params[device].past_second[0]
@@ -159,7 +161,7 @@ async def save_video(device: DeviceParams, filename: str):
 
 @app.get("/api/live/{device}")
 async def live(request: Request, device: int):
-    return templates.TemplateResponse("stream.html", {"request": request, "device": device})
+    return templates.TemplateResponse("stream.html", {"request": request, "device": device, "url": f"{config['api_url']}:{config['api_port']}"})
 
 
 @app.get('/api/stream/{device}')

@@ -11,7 +11,7 @@
             // Function to fetch and replace the image
             function fetchAndReplaceImage() {
                 // Replace the URL with the actual URL of the image you want to fetch
-                const imageUrl = 'http://127.0.0.1:8000/api/stream/{{device}}';
+                const imageUrl = '{{url}}/api/stream/{{device}}';
 
                 fetch(imageUrl)
                     .then(response => {
