@@ -39,12 +39,12 @@ for device in sorted(sorted_events.keys()):
     for i in range(len(rows)):
         del rows[i][0]
     st.markdown("### Notable Events")
-    rows = [i for i in rows if i[1].timestamp() - i[0].timestamp() > 60]
+    notable_rows = [i for i in rows if i[1].timestamp() - i[0].timestamp() > 60]
 
     st.dataframe(
         pd.DataFrame(
             columns=["Movement Start", "Movement End", "Time Elapsed", "Video Path"],
-            data=rows
+            data=notable_rows
         ),
         column_config={
             "Video Path": st.column_config.LinkColumn()
