@@ -1,46 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Fetcher</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Device {{device}} Live Feed</title>
+    </head>
+    <body>
+        <img id="targetImage" src="initial-image.jpg" alt="Initial Image">
+        <script>
+            // Function to fetch and replace the image
+            function fetchAndReplaceImage() {
+                // Replace the URL with the actual URL of the image you want to fetch
+                const imageUrl = 'http://127.0.0.1:8000/api/stream/{{device}}';
 
-<img id="targetImage" src="initial-image.jpg" alt="Initial Image">
+                fetch(imageUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch image. Status: ${response.status}`);
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const objectURL = URL.createObjectURL(blob);
+                        const targetImage = document.getElementById('targetImage');
+                        targetImage.src = objectURL;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching image:', error);
+                    });
+            }
 
-<script>
-    // Function to fetch and replace the image
-    function fetchAndReplaceImage() {
-        // Replace the URL with the actual URL of the image you want to fetch
-        const imageUrl = 'http://127.0.0.1:8000/api/stream/{{device}}';
+            // Set up the interval to fetch and replace the image 24 times a second (every 41.67 milliseconds)
+            const fetchInterval = setInterval(fetchAndReplaceImage, 41.67);
 
-        fetch(imageUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch image. Status: ${response.status}`);
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const objectURL = URL.createObjectURL(blob);
-                const targetImage = document.getElementById('targetImage');
-                targetImage.src = objectURL;
-            })
-            .catch(error => {
-                console.error('Error fetching image:', error);
-            });
-    }
+            // Stop fetching after a certain duration (e.g., 5 seconds)
+            //setTimeout(() => {
+              //  clearInterval(fetchInterval);
+                //console.log('Image fetching stopped.');
+            //}, 5000);
+        </script>
 
-    // Set up the interval to fetch and replace the image 24 times a second (every 41.67 milliseconds)
-    const fetchInterval = setInterval(fetchAndReplaceImage, 41.67);
-
-    // Stop fetching after a certain duration (e.g., 5 seconds)
-    //setTimeout(() => {
-      //  clearInterval(fetchInterval);
-        //console.log('Image fetching stopped.');
-    //}, 5000);
-</script>
-
-</body>
+    </body>
 </html>
