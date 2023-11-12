@@ -126,6 +126,7 @@ async def detect_motion(device: int) -> bool:
         if config["send_alerts"] and params[device].consecutive_detects > config["alert_threshold"] * 24:
             for i in config["email_recipients"]:
                 send_alert.send_email(device, params[device].motion_start, i)
+            for i in config["text_recipients"]
                 send_alert.send_text_email(device, params[device].motion_start, i)
         asyncio.create_task(save_video(params[device], filename))
         params[device].consecutive_detects = 0
