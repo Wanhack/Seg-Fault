@@ -1,6 +1,9 @@
 # import the opencv library
 import asyncio
 import io
+import sys
+import traceback
+
 import cv2
 import aiohttp
 import json
@@ -22,9 +25,10 @@ async def main():
                 cv2.resize(frame, (600,600))
                 is_success, buffer = cv2.imencode(".jpg", frame)
                 io_buf = io.BytesIO(buffer)
-                async with session.post(f"{config["api_url"]}:{config["api_port"]}/api/frame/{config["device"]}", data={"file": io_buf}) as resp:
+                async with session.post(f'{config["api_url"]}:{config["api_port"]}/api/frame/{config["device_id"]}', data={"file": io_buf}) as resp:
                     pass
-        except:
+        except Exception as e:
+            traceback.print_exc()
             vid.release()
             cv2.destroyAllWindows()
 
