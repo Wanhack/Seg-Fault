@@ -1,6 +1,8 @@
 {
-    "host": "redis-11444.c10.us-east-1-2.ec2.cloud.redislabs.com",
-    "username": "default",
-    "password": "TVIqnCc2OIVNFYS9wAiX2V4UdTNEzUhZ",
-    "port": 11444
+    "host": "",
+    "username": "",
+    "password": "",
+    "port": 0,
+    "email_user": "",
+    "email_pass": ""
 }
