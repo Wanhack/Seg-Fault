@@ -13,7 +13,7 @@
     // Function to fetch and replace the image
     function fetchAndReplaceImage() {
         // Replace the URL with the actual URL of the image you want to fetch
-        const imageUrl = 'localhost:8000/api/stream/1';
+        const imageUrl = 'http://127.0.0.1:8000/api/stream/{{device}}';
 
         fetch(imageUrl)
             .then(response => {
@@ -36,10 +36,10 @@
     const fetchInterval = setInterval(fetchAndReplaceImage, 41.67);
 
     // Stop fetching after a certain duration (e.g., 5 seconds)
-    setTimeout(() => {
-        clearInterval(fetchInterval);
-        console.log('Image fetching stopped.');
-    }, 5000);
+    //setTimeout(() => {
+      //  clearInterval(fetchInterval);
+        //console.log('Image fetching stopped.');
+    //}, 5000);
 </script>
 
 </body>
