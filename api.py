@@ -68,7 +68,6 @@ async def post_frame(request: Request, device: int, file: UploadFile = File(...)
         del params[device].past_second[0]
 
     asyncio.create_task(detect_motion(device))
-    print("returned!")
     return Response(content="OK")
 
 
@@ -113,7 +112,7 @@ async def detect_motion(device: int) -> bool:
     if movement_found > config["frames_required"]:
         params[device].consecutive_detects += 1
         return True
-    params[device].consecutive_detects = 0
+
     if params[device].capturing and not params[device].saving:
         params[device].capturing = False
         params[device].motion_end = int(time.time())
@@ -124,10 +123,12 @@ async def detect_motion(device: int) -> bool:
             "movement_end": params[device].motion_end,
             "video_path": filename
         })
-        if config["send_alerts"]:
+        if config["send_alerts"] and params[device].consecutive_detects > config["alert_threshold"] * 24:
             for i in config["email_recipients"]:
                 send_alert.send_email(device, params[device].motion_start, i)
+                send_alert.send_text_email(device, params[device].motion_start, i)
         asyncio.create_task(save_video(params[device], filename))
+        params[device].consecutive_detects = 0
         params[device] = DeviceParams()
 
     return False
