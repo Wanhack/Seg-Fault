@@ -11,11 +11,10 @@ lock = threading.Lock()
 
 with open("config.json", "r") as f:
     config = json.load(f)
-api_url = config["api_url"]
-api_port = config["api_port"]
+api_url = f'{config["api_url"]}:{config["api_port"]}'
 
 
-events = requests.get(f"{api_url}:{api_port}/api/events").json()
+events = requests.get(f"{api_url}/api/events").json()
 sorted_events = {key: [] for key in set([i["device"] for i in events])}
 
 for event in events:
@@ -26,7 +25,7 @@ with open("log.txt", "w") as f:
 devices = range(0, 6)
 
 for device in sorted(sorted_events.keys()):
-    st.header(f"Device {int(device)}")
+    st.markdown(f"## [Device {int(device)}]({api_url}/api/live/{int(device)})")
 
     rows = []
     for i in sorted_events[device]:
@@ -36,7 +35,7 @@ for device in sorted(sorted_events.keys()):
         event[1] = datetime.datetime.fromtimestamp(int(event[1]))
         event[2] = datetime.datetime.fromtimestamp(int(event[2]))
         event.insert(3, strftime("%H:%M:%S", gmtime((event[2] - event[1]).total_seconds())))
-        event[-1] = f"http://localhost:8000/events/videos/{event[-1]}"
+        event[-1] = f"{api_url}/events/videos/{event[-1]}"
     for i in range(len(rows)):
         del rows[i][0]
 
