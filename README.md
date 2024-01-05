@@ -2,13 +2,7 @@
 
 ## A baby monitor project focused on efficient and inexpensive monitoring of infants without paying a hefty premium for a cloud-based off the shelf webcam monitor.
 ## We are motivated by the need for the market to provide an inexpensive monitor solution to new parents without breaking the bank or relying on sketchy cloud providers. 
-## The project was prompted by competing in the HackUNT Hackathon and is being entered for judging in multiple challenges such as:
-    ## Respec: Automate my life. Find a creative and novel way to fully automate something in my (or your) daily life, so that it will save time and effort throughout the week.
-          ## You may automate pretty much anything, so long as you can justify the time savings in my day/week. 
-    ## GoDaddy: Best Domain Name from GoDaddy Registry.
-    ## Redis Cloud: Show us how you’ve used Redis Cloud in a way that showcases your unique and specific data structure needs.
-    ## Streamlit: Hack with Streamlit this weekend. 
-## In the development of this project we've learned how to use a lot of new project frameworks and tools and had lots of fun working with new people.
+## The project was prompted by competing in the HackUNT Hackathon, this branch of the project is a continuation which plans to trim the fat of the original project and be more of a consumer-focused and simple setup implementation.
 
 ## Table of Contents
 - [Installation](#installation)
@@ -18,7 +12,8 @@
 
 ## Installation
 
-What are the steps required to install your project? Provide a step-by-step description of how to get the development environment running.
+Requires a raspberry pi board of any level aside from raspberry pi 0. Current issues with libcamera library implementation caused roadblocks in the original project on pi0, so this branch will be configured for a higher-end board in mind.
+For testing I will be using a Raspberry Pi 4 2GB model along with a adafruit IR camera for raspberry pi. 
 
 ## Usage
 
@@ -34,9 +29,11 @@ To add a screenshot, create an `assets/images` folder in your repository and upl
 
 List your collaborators, if any, with links to their GitHub profiles.
 
-If you used any third-party assets that require attribution, list the creators with links to their primary web presence in this section.
-
-If you followed tutorials, include links to those here as well.
+My collaborators on the original hackathon project that I am branching from are listed here:
+https://github.com/midnight145
+Super cool dude who helped out a ton and learned to love the god-awful nosql database syntax to make our redis system work. Huge help and we couldn't have won without him. Did all the backend work.
+https://github.com/wanhack
+Another super cool dude. Our resident embedded systems and raspberry pi expert who found a way for us to continue after the aforementioned raspberry pi 0 headaches gave us a serious speedbump. Did all the hardware and raspberry pi work. 
 
 ## License
 
