@@ -30,8 +30,10 @@ To add a screenshot, create an `assets/images` folder in your repository and upl
 List your collaborators, if any, with links to their GitHub profiles.
 
 My collaborators on the original hackathon project that I am branching from are listed here:
+
 https://github.com/midnight145
 Super cool dude who helped out a ton and learned to love the god-awful nosql database syntax to make our redis system work. Huge help and we couldn't have won without him. Did all the backend work.
+
 https://github.com/wanhack
 Another super cool dude. Our resident embedded systems and raspberry pi expert who found a way for us to continue after the aforementioned raspberry pi 0 headaches gave us a serious speedbump. Did all the hardware and raspberry pi work. 
 
